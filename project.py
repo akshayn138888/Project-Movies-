@@ -11,7 +11,6 @@ omdb= pd.read_json('omdb-data.json.gz', orient='record', lines=True)
 
 # Country of Origin Stats. 
 
-import matplotlib.pyplot as plt
 #plt.hist(wiki1['original_language'].values)
 #plt.show()
 summ =  wiki1['enwiki_title'].sum()
@@ -22,6 +21,21 @@ def calc(row):
 wiki1['percent']=wiki1.apply(func=calc,axis=1)
 wiki_bylanguage = wiki1.sort_values(by='percent',ascending=False).reset_index()
 # wiki_bylanguage[:10]
+
+
+#ploting our data entries / What we have and what we dont have. 
+
+rt1 = rt[['imdb_id', 'critic_percent', 'audience_percent', 'audience_ratings','critic_average']]
+#rt.count().plot.bar()
+
+#Plotting how many movies made profit and how many did not. 
+
+wiki_movies2 = wiki_movies[['imdb_id', 'made_profit']].dropna()
+
+profit_movie = pd.merge(rt1, wiki_movies2, on='imdb_id', how='outer')
+profit_movie = profit_movie[['imdb_id', 'critic_percent', 'audience_percent','made_profit']]
+#profit_movie = profit_movie.dropna()
+#profit_movie.count().plot.bar() #made profit or not. 
 
 
 
