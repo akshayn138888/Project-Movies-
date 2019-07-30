@@ -37,5 +37,50 @@ profit_movie = profit_movie[['imdb_id', 'critic_percent', 'audience_percent','ma
 #profit_movie = profit_movie.dropna()
 #profit_movie.count().plot.bar() #made profit or not. 
 
+################################
 
+profit_movie.groupby('made_profit').mean().plot.bar() #profitable movies have higher critic and audience ratings. 
+profit_movie.groupby('made_profit').mean()
+
+
+#profit_movie = pd.merge(rt1, wiki_movies2, on='imdb_id', how='outer')
+#profit_movie
+
+#profit_movie['audience_percent'].plot.bar()
+profit_movie['audience_percent'].hist()
+
+profit_movie['critic_percent'].hist()
+
+################################
+
+director_data = wiki_movies[['director','imdb_id']]
+movie_ratings = rt[['imdb_id', 'critic_percent', 'audience_percent' ]]
+director_ratings = pd.merge( movie_ratings, director_data, on='imdb_id', how ='outer')
+director_ratings = director_ratings[['imdb_id', 'critic_percent', 'audience_percent' , 'director']]
+
+director_ratings.count().plot.bar()
+
+director_audiencR = director_ratings[['audience_percent','director']]
+
+def astype(row):
+    return str(row['director'])
+
+director_audiencR['director']=director_audiencR.apply(func=astype,axis=1)
+director_audiencR = director_audiencR.groupby('director').mean().reset_index()
+director_audiencR= director_audiencR.dropna()
+
+
+director_audiencR = director_ratings[['critic_percent','director']]
+def astype(row):
+    return str(row['director'])
+
+director_audiencR['director']=director_audiencR.apply(func=astype,axis=1)
+director_audiencR = director_audiencR.groupby('director').mean().reset_index()
+director_audiencR= director_audiencR.dropna()
+
+
+
+director_audiencR['critic_percent'].hist( bins = 20, color = 'orange')
+
+################################
 
