@@ -751,6 +751,47 @@ print("MAX SCORE = {} @ variables = {} ({}) & num_clusters = {}".format(mscore,m
 
 
 
+################################ Predict made profit using directors ################################### Ids 
+#np.hstack(wiki_movies['genre']).tolist()
+df2 = wiki_movies
+df2 = df2[['imdb_id', 'director']].dropna()
+from sklearn.feature_extraction.text import CountVectorizer
+vec=CountVectorizer()
+df2['director2']=df2.apply(func=lambda row:" ".join(row['director']),axis=1)
+df2=pd.DataFrame(vec.fit_transform(df2['director2']).toarray(),columns=vec.get_feature_names()).reset_index()
+
+wiki_movies[['imdb_id','director']]
+
+df2['level_0'] = df2['index'].values
+
+df3 = wiki_movies[['imdb_id', 'director']].dropna().reset_index().reset_index()
+
+directors = pd.merge(df3, df2, on= 'level_0', how='outer')
+
+cast_dir = wiki_movies[['imdb_id', 'director', 'cast_member', 'made_profit']].reset_index(drop=True)
+cast_dir = cast_dir.dropna()
+
+m_dir_profit = pd.merge(directors, cast_dir , on= 'imdb_id', how='outer')
+
+
+m_dir_profit = m_dir_profit.dropna()
+
+X = m_dir_profit.drop(columns=['imdb_id','director_x', 'director_y', 'cast_member']).values
+y = m_dir_profit['made_profit'].values
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10)
+
+from sklearn.neighbors import KNeighborsClassifier 
+knn_model = make_pipeline(
+    KNeighborsClassifier(n_neighbors=20)
+    )
+knn_model.fit(X_train, y_train)
+y_prediction = knn_model.predict(X_test) 
+print( 'Director is a good indicator os profit (KNN Model result)'+ accuracy_score(y_test, y_prediction))
+
+# It tells that directors are the good indicator of profit. Using data we have. 
+
+
+
 
 
 
