@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 import nltk 
 import matplotlib.pyplot as plt
+import sys
+import warnings
+
+
 
 genres = pd.read_json('genres.json.gz', orient='record', lines=True)
 wiki_movies = pd.read_json('wikidata-movies.json.gz', orient='record', lines=True)
@@ -13,6 +17,11 @@ omdb= pd.read_json('omdb-data.json.gz', orient='record', lines=True)
 
 #plt.hist(wiki1['original_language'].values)
 #plt.show()
+wiki = wiki_movies.filter(items=['original_language', 'enwiki_title'])
+wiki1 = wiki.groupby('original_language').count()
+wiki1 = wiki1.sort_values(by=['enwiki_title'])
+wiki1=wiki1.reset_index()
+
 summ =  wiki1['enwiki_title'].sum()
 
 def calc(row):
@@ -194,15 +203,26 @@ omdb_awards = omdb[['imdb_id','num_nominations','num_awards', 'num_oscars', 'num
 ################## Count Vectorizer ########################
 
 #np.hstack(wiki_movies['genre']).tolist()
+rt = rt[['imdb_id' , 'critic_percent', 'audience_percent', 'audience_ratings', 'audience_average', 'critic_average']]
+wiki_movies2 = wiki_movies[['imdb_id', 'made_profit']]
+best_variables = pd.merge( rt ,wiki_movies2 , on='imdb_id', how ='outer')
+best_variables = pd.merge(best_variables,omdb_awards,on='imdb_id', how ='outer' )
+
+wiki_movies = wiki_movies.reset_index()
+
 from sklearn.feature_extraction.text import CountVectorizer
 vec=CountVectorizer()
+
 wiki_movies['genre2']=wiki_movies.apply(func=lambda row:" ".join(row['genre']),axis=1)
+
+#wiki_movies = wiki_movies.reset_index()
+
 df1=pd.DataFrame(vec.fit_transform(wiki_movies['genre2']).toarray(),columns=vec.get_feature_names()).reset_index()
 
+#data = wiki_movies.reset_index()
+best_vars = pd.merge(wiki_movies, df1 , on='index', how='outer')
 
-best_vars = pd.merge(wiki_movies, df1 , on= 'index', how='outer')
-
-best_vars2 = pd.merge(best_variables, best_vars, on= 'imdb_id', how='outer')
+best_vars2 = pd.merge(best_variables, best_vars, on ='imdb_id', how='outer')
 
 #best_vars_final = best_vars2.drop(col = ['index', 'based_on', 'cast_member', 'country_of_origin', 'eniki_title','filming_location', 'genre', 'label', 'made_profit_y', 'main_subject', 'metacritic_id', 'original_language', 'rotten_tomatoes_id', 'series','wikidata_id',
  #'genre2'])
@@ -649,19 +669,20 @@ bayes_model = GaussianNB()
 bayes_model.fit(X_train, y_train)
 y_prediction = bayes_model.predict(X_test) 
 print('GaussianNB Score: ' )
- print (accuracy_score(y_test, y_prediction)
+print (accuracy_score(y_test, y_prediction))
 
 ############## K-nearest neighbours Model#########
 
 from sklearn.neighbors import KNeighborsClassifier 
 
- knn_model = make_pipeline(
- KNeighborsClassifier(n_neighbors=13)
-  )
- knn_model.fit(X_train, y_train)
- y_prediction = knn_model.predict(X_test) 
- print('knn_model Score (13 clusters): )
- print (accuracy_score(y_test, y_prediction)
+knn_model = make_pipeline(KNeighborsClassifier(n_neighbors=13))
+knn_model.fit(X_train, y_train)
+y_prediction = knn_model.predict(X_test) 
+
+print('knn_model Score (13 clusters):')
+
+print (accuracy_score(y_test, y_prediction))
+
 
  ##############SVC Model ##################
 
@@ -789,7 +810,7 @@ knn_model = make_pipeline(
 knn_model.fit(X_train, y_train)
 y_prediction = knn_model.predict(X_test) 
 print( 'Director is a good indicator os profit (KNN Model result)')
-print (accuracy_score(y_test, y_prediction)
+print (accuracy_score(y_test, y_prediction))
 
 # It tells that directors are the good indicator of profit. Using data we have. 
 
@@ -946,7 +967,7 @@ svc_model.fit(X_train, y_train)
 y_prediction = svc_model.predict(X_test) 
 print('Predicting Profit using audience_avg , crictic_avg, mentions SVC_model') 
 
-print((accuracy_score(y_test, y_prediction))
+print(accuracy_score(y_test, y_prediction))
 
 
 from sklearn.naive_bayes import GaussianNB
@@ -954,7 +975,7 @@ bayes_model = GaussianNB()
 bayes_model.fit(X_train, y_train)
 y_prediction = bayes_model.predict(X_test) 
 print('Predicting Profit using audience_avg , crictic_avg, mentions Gaussian_model')
-print(accuracy_score(y_test, y_prediction)
+print(accuracy_score(y_test, y_prediction))
 
 
 #################### K-means Clustering ##################
@@ -971,7 +992,7 @@ f = df[['audience_average', 'critic_average' , 'mentions'  ]]
 # plt.figure(figsize=(8, 6))
 # plt.scatter(f[:0],f[:1])
 
-%matplotlib inline
+
 clustering = KMeans(n_clusters = 6, random_state = 10)
 clustering.fit(f)
 
