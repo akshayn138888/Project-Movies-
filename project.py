@@ -650,6 +650,105 @@ bayes_model.fit(X_train, y_train)
 y_prediction = bayes_model.predict(X_test) 
 print('GaussianNB Score: ' + accuracy_score(y_test, y_prediction))
 
+############## K-nearest neighbours Model#########
+
+from sklearn.neighbors import KNeighborsClassifier 
+
+ knn_model = make_pipeline(
+ KNeighborsClassifier(n_neighbors=13)
+  )
+ knn_model.fit(X_train, y_train)
+ y_prediction = knn_model.predict(X_test) 
+ print('knn_model Score (13 clusters): ' + accuracy_score(y_test, y_prediction))
+
+ ##############SVC Model ##################
+
+from sklearn.svm import SVC    
+    
+svc_model = make_pipeline(
+        
+        SVC(kernel='linear',C=0.0001)
+    )
+    
+#svc_model.fit(X_train, y_train)
+#y_prediction = svc_model.predict(X_test) 
+#print(accuracy_score(y_test, y_prediction))
+
+############ Finding How Many variables and clusters give the Highest Ratings #############
+
+X = best_vars.drop(columns=['imdb_id','made_profit_y'])
+y = best_vars['made_profit_y'].values
+
+feature_names=X.columns.tolist()
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+ARR=[]
+max_config=[]
+def hyper_parametre(n,kmax):
+    max_score=0.0
+    for i in range(1,n+1):
+        f_list=feature_names[:i]
+        #print("f_list=",f_list)
+        x = X_train[f_list]
+        x_test=X_test[f_list]
+        ar=[]
+        for j in range(1,kmax+1):
+            knn_model = make_pipeline( KNeighborsClassifier(n_neighbors=j) )
+            knn_model.fit(x.values, y_train)
+            y_prediction = knn_model.predict(x_test) 
+            score=accuracy_score(y_test, y_prediction)
+            if score>max_score:
+                max_score=score
+                max_config.append([i,j,f_list])
+            ar.append(accuracy_score(y_test, y_prediction))
+        ARR.append(ar)
+        
+    return max_score,max_config
+            
+mscore,mconfig=hyper_parametre(10,30)        
+print("MAX SCORE = {} @ variables = {} ({}) & num_clusters = {}".format(mscore,mconfig[-1][0],mconfig[-1][2],mconfig[-1][1]))
+
+#sns.heatmap(ARR) ######### Heat Map of Variables. How different variables affect our Model accuracy score. 
+
+############################ svc ##############################
+
+# from sklearn.svm import SVC    
+# X = best_vars.drop(columns=['imdb_id','made_profit_y'])
+# y = best_vars['made_profit_y'].values
+
+# feature_names=X.columns.tolist()
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+# ARR=[]
+# max_config=[]
+# def hyper_parametre(n):
+#     max_score=0.0
+#     for i in range(1,n):
+#         f_list=feature_names[:i]
+#         #print("f_list=",f_list)
+#         x = X_train[f_list]
+#         x_test=X_test[f_list]
+#         ar=[]
+#         from sklearn.svm import SVC    
+#         svc_model = make_pipeline(SVC(kernel='linear',C=0.0001))
+#         svc_model.fit(X_train, y_train)
+#         y_prediction = svc_model.predict(X_test) 
+#         score = accuracy_score(y_test, y_prediction)
+#         if score>max_score:
+#             max_score=score
+#             max_config.append([i,f_list])
+#         ar.append(accuracy_score(y_test, y_prediction))
+#         ARR.append(ar)
+#     return max_score,max_config
+
+
+#print (hyper_parametre(6))  
+#import seaborn as sns
+#sns.set()
+#plt.figure(figsize=(20, 12))
+#plt.grid(True, color= 'skyblue')
+#plt.plot(ARR, color = 'red', linewidth = 5.0 ) #
+
+
+
 
 
 
