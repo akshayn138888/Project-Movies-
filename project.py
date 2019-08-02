@@ -648,7 +648,8 @@ from sklearn.naive_bayes import GaussianNB
 bayes_model = GaussianNB()
 bayes_model.fit(X_train, y_train)
 y_prediction = bayes_model.predict(X_test) 
-print('GaussianNB Score: ' + accuracy_score(y_test, y_prediction))
+print('GaussianNB Score: ' )
+ print (accuracy_score(y_test, y_prediction)
 
 ############## K-nearest neighbours Model#########
 
@@ -659,7 +660,8 @@ from sklearn.neighbors import KNeighborsClassifier
   )
  knn_model.fit(X_train, y_train)
  y_prediction = knn_model.predict(X_test) 
- print('knn_model Score (13 clusters): ' + accuracy_score(y_test, y_prediction))
+ print('knn_model Score (13 clusters): )
+ print (accuracy_score(y_test, y_prediction)
 
  ##############SVC Model ##################
 
@@ -786,17 +788,229 @@ knn_model = make_pipeline(
     )
 knn_model.fit(X_train, y_train)
 y_prediction = knn_model.predict(X_test) 
-print( 'Director is a good indicator os profit (KNN Model result)'+ accuracy_score(y_test, y_prediction))
+print( 'Director is a good indicator os profit (KNN Model result)')
+print (accuracy_score(y_test, y_prediction)
 
 # It tells that directors are the good indicator of profit. Using data we have. 
 
 
+########################## Plotting Profitable Directors #########################
+
+m_dir_profit = m_dir_profit.reset_index(drop = True)
+m_dir_profit = m_dir_profit.drop(columns=['imdb_id','director_x', 'director_y', 'cast_member', 'imdb_id', 'index_x', 'index_y', 'level_0'])
+#m_dir_profit.columns
+
+
+d_profit = m_dir_profit.sum(axis = 0)
+
+
+director_list= list(m_dir_profit.columns)
+data = {'director':director_list,'made_profit':d_profit }
+Profit_makers = pd.DataFrame(data).reset_index(drop = True)
+
+profitable_dirs = Profit_makers[Profit_makers.made_profit >= 2]
+
+K = profitable_dirs.sort_values(by='made_profit', ascending=False).reset_index(drop = True)
+K = K.drop(K.index[0])
+#sns.K.plot()
+
+###### PLotting how many directors are profitable (most of the time)#############
+
+sns.distplot(K['made_profit'], color = 'red')
+sns.kdeplot(K['made_profit'], color = 'purple' )
+sns.distplot(K['made_profit'])
+
+sns.pairplot(K, hue='made_profit', size=10);
+
+sns.distplot(K['made_profit'])
+
+############ Plotting Linear Regression #################################
+
+#https://towardsdatascience.com/linear-regression-in-6-lines-of-python-5e1d0cd05b8d
+
+
+k = best_vars_final[[
+ 'audience_percent',
+ 'audience_average']]
+#sns.pairplot(k)
+
+
+import matplotlib.pyplot as plt  # To visualize
+from sklearn.linear_model import LinearRegression
+
+X = k.iloc[:, 0].values.reshape(-1, 1)  # values converts it into a numpy array
+Y = k.iloc[:, 1].values.reshape(-1, 1)  # -1 means that calculate the dimension of rows, but have 1 column
+linear_regressor = LinearRegression()  # create object for the class
+linear_regressor.fit(X, Y)  # perform linear regression
+Y_pred = linear_regressor.predict(X) 
+# plt.figure(figsize = (10,10))
+# plt.scatter(X, Y)
+# plt.plot(X, Y_pred, color='red')
+# plt.show()
+
+s = best_vars_final[[
+ 'critic_percent',
+ 'critic_average']]
+
+X = s.iloc[:, 0].values.reshape(-1, 1)  # values converts it into a numpy array
+Y = s.iloc[:, 1].values.reshape(-1, 1)  # -1 means that calculate the dimension of rows, but have 1 column
+linear_regressor = LinearRegression()  # create object for the class
+linear_regressor.fit(X, Y)  # perform linear regression
+Y_pred = linear_regressor.predict(X) 
+# plt.figure(figsize = (10,10))
+# plt.scatter(X, Y)
+# plt.plot(X, Y_pred, color='green',alpha = 1.0)
+# plt.show()
+
+############ Plotting Linear Regression () #################################
+
+
+df = best_vars_final 
+
+df['mentions'] = df['num_nominations'] + df['num_awards'] + df['num_oscars']+df['num_golden_globe']+ df['num_bafta'] 
+
+
+#sns.pairplot(df[['mentions', 'critic_average', 'audience_average']])
+
+
+s = df[['mentions', 'critic_average', 'audience_average']]
+import seaborn as sns
+sns.set()
+X = s.iloc[:, 0].values.reshape(-1, 1)  # values converts it into a numpy array
+Y = s.iloc[:, 1].values.reshape(-1, 1)  # -1 means that calculate the dimension of rows, but have 1 column
+linear_regressor = LinearRegression()  # create object for the class
+linear_regressor.fit(X, Y)  # perform linear regression
+
+Y_pred = linear_regressor.predict(X) 
+
+import seaborn as sns
+sns.set()
+plt.figure(figsize = (10,10))
+
+plt.ylabel('Audience Ratings')
+
+plt.xlabel('Total Awards and Nominations')
+# plt.scatter(X, Y)
+
+# plt.plot(X, Y_pred, color='orange',linewidth = 3.0)
+
+# plt.show()
+
+j = df[[ 'critic_average', 'audience_average']]
+import seaborn as sns
+sns.set()
+X = j.iloc[:, 0].values.reshape(-1, 1)  # values converts it into a numpy array
+Y = j.iloc[:, 1].values.reshape(-1, 1)  # -1 means that calculate the dimension of rows, but have 1 column
+linear_regressor = LinearRegression()  # create object for the class
+linear_regressor.fit(X, Y)  # perform linear regression
+Y_pred = linear_regressor.predict(X) 
+
+# import seaborn as sns
+# sns.set()
+# plt.figure(figsize = (10,10))
+
+# plt.ylabel('Critic Average')
+
+# plt.xlabel('Audience Average')
+# plt.scatter(X, Y)
+
+# plt.plot(X, Y_pred, color='green',linewidth = 3.0)
+
+# plt.show()
+
+
+################### Predicting Profit using audience_avg , crictic_avg, mentions ##########################
+
+df1 = df[['audience_average','critic_average', 'mentions' ]]
+
+X = df1.values
+y = df['made_profit_x'].values
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
 
 
 
 
+from sklearn.neighbors import KNeighborsClassifier 
+knn_model = make_pipeline(
+    KNeighborsClassifier(n_neighbors=22)
+    )
+knn_model.fit(X_train, y_train)
+y_prediction = knn_model.predict(X_test) 
+print('Predicting Profit using audience_avg , crictic_avg, mentions knn_model')
+print( accuracy_score(y_test, y_prediction))
 
+from sklearn.svm import SVC    
+svc_model = make_pipeline(SVC(kernel='linear',C=0.1))
+svc_model.fit(X_train, y_train)
+y_prediction = svc_model.predict(X_test) 
+print('Predicting Profit using audience_avg , crictic_avg, mentions SVC_model') 
+
+print((accuracy_score(y_test, y_prediction))
+
+
+from sklearn.naive_bayes import GaussianNB
+bayes_model = GaussianNB()
+bayes_model.fit(X_train, y_train)
+y_prediction = bayes_model.predict(X_test) 
+print('Predicting Profit using audience_avg , crictic_avg, mentions Gaussian_model')
+print(accuracy_score(y_test, y_prediction)
+
+
+#################### K-means Clustering ##################
+# https://stackoverflow.com/questions/28227340/kmeans-scatter-plot-plot-different-colors-per-cluster
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+f = df[['audience_average', 'critic_average' , 'mentions'  ]]
+
+# # Scaling the data to normalize
+# model = KMeans(n_clusters=10).fit(f)
+
+# # Visualize it:
+# plt.figure(figsize=(8, 6))
+# plt.scatter(f[:0],f[:1])
+
+%matplotlib inline
+clustering = KMeans(n_clusters = 6, random_state = 10)
+clustering.fit(f)
+
+color_theme = np.array(['darkblue', 'lightsalmon', 'red', 'lightyellow', 'brown', 'green'])
+
+
+
+plt.figure(figsize =(20,8))
+# plt.subplot(1,2,1)
+# plt.scatter(x=f['audience_average'], y=f['mentions'], c = color_theme ,s=50)
+# plt.title('K-Means  Classification')
+
+plt.subplot(1,2,2)
+plt.ylabel('Audience Ratings')
+
+plt.xlabel('Total Awards and Nominations')
+plt.scatter(x = f['mentions'],y = f['critic_average'] , c = color_theme[clustering.labels_], s=50 )
+plt.axvline(12.5, color="k", linestyle="--");
+plt.axvline(8.5, color="k", linestyle="--");
+plt.axvline(4.7, color="k", linestyle="--");
+plt.title('K-Means  Classification')
+
+import plotly.express as px
+
+# fig = px.scatter(f, x="mentions", y="critic_average", color="mentions",
+#                  size='critic_average', hover_data=['mentions'])
+# fig.show()
+
+# import plotly.express as px
+
+# fig = px.scatter(f, x="mentions", y="critic_average", color="mentions",
+#                  size='critic_average', hover_data=['mentions'])
+# fig.show()
+
+fig = px.scatter(f, x="mentions", y="audience_average", color="mentions",
+                  size='critic_average', hover_data=['mentions'])
+#fig.show()
+
+########################
 
 
 
