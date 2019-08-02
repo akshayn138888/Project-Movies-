@@ -1010,6 +1010,10 @@ fig = px.scatter(f, x="mentions", y="audience_average", color="mentions",
                   size='critic_average', hover_data=['mentions'])
 #fig.show()
 
+
+
+
+
 ######################## Finding Directors with most Probablilty #####################
 
 nk = K[K['made_profit']>=4]
@@ -1030,6 +1034,54 @@ plt.xlabel('Director IDs',fontsize=20)
 
 
 
+
+
+
+
+#################### Bubble Charts and Replacing Wiki_data IDS with actual names ### bigger the bubble better the profitability
+
+#https://plot.ly/python/bubble-charts/
+
+#https://stackoverflow.com/questions/28999287/generate-random-colors-rgb
+
+labels2 = ['Steven Speilberg' , 
+           'Robert Zemeckis' , 
+           'Quintan Tarantino', 
+           'Woody Allen',
+           'Christopher Nolan' , 
+           'Tim Burton',
+           'Peter Jackson' ,
+           'Robert Rodriguez',
+           'Wolfgang Peterson',
+           'Clint Eastwood', 
+           'Ridley Scott',
+           'Oliver Stone' ,
+           'Martin Scoresese',
+           'Harold Ramis']  
+size = numbers[:12]/numbers.sum()
+size1 = size*1000
+import plotly.graph_objects as go
+
+import random
+
+number_of_colors = 29
+
+color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+             for i in range(number_of_colors)]
+
+
+fig = go.Figure(data=[go.Scatter(
+    x=labels2, y=numbers[:12],
+    mode='markers',
+    marker=dict(
+       color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+             for i in range(number_of_colors)],
+        opacity=[1, 0.8, 0.6, 0.4],
+        size=size1,
+    )
+)])
+
+#fig.show()
 
 
 
