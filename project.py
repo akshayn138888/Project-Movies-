@@ -1010,7 +1010,26 @@ fig = px.scatter(f, x="mentions", y="audience_average", color="mentions",
                   size='critic_average', hover_data=['mentions'])
 #fig.show()
 
-########################
+######################## Finding Directors with most Probablilty #####################
+
+nk = K[K['made_profit']>=4]
+
+labels = np.array(list(nk.director))
+
+numbers = np.array(list(nk.made_profit))
+
+
+
+plt.figure(figsize=(25, 5))
+plt.grid(True, color= 'purple')
+plt.ylabel('Profitability',fontsize=20)
+
+plt.xlabel('Director IDs',fontsize=20)
+
+#plt.plot(labels,numbers, color = 'salmon', linewidth = 5.0 ) 
+
+
+
 
 
 
