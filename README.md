@@ -2,6 +2,8 @@ Movies Project - Determining Factors that make a successful movies
 
 Definitions of success = awards, profit making and getting best good ratings. 
 
+Side Note: SVC machine learning algorithm might take longer(2-3 mins) in project.ipynb. To see visulizations faster. Please comment out that code. Thank you.  
+
 All the code is python 3
 
 You might need to install Plotly before running the code in. In your terminal run: 
@@ -23,6 +25,6 @@ To run the project.py file and see the accuracy scores (no visualization / visua
 
 Be patient Step 4 will take at east 1min 45 secs to run and all accuracy scores will be displayed in your terminal window. 
 
-5. For data Visualization, assuming that you have jupyter notebook installed on your computer. Open project.ipynb file and run all. All visualizations will appear as code runs through. 
+5. For data Visualization, assuming that you have jupyter notebook installed on your computer. Open project.ipynb file and run all. All visualizations will appear as code runs through. Side Note: SVC 
 
 Thank you for reading. 
